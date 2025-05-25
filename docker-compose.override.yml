@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  app:
+    command: npm run start:dev
+    environment:
+      - NODE_ENV=development
+      - PORT=4000
+    volumes:
+      - ./:/app
+      - /app/node_modules
