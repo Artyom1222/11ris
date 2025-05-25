@@ -1,0 +1,39 @@
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 60
+      arrivalRate: 20
+      rampTo: 20
+      name: "Sustained load"
+  plugins:
+    metrics-by-endpoint: {}
+    expect: {}
+  ensure:
+    p99: 500
+    p95: 200
+    
+scenarios:
+  - name: "Health check endpoint"
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+
+  - name: "Tours endpoint with authentication"
+    weight: 3
+    flow:
+      - post:
+          url: "/auth/login"
+          json:
+            login: "admin"
+            password: "admin"
+          capture:
+            - json: "$.token"
+              as: "token"
+      - get:
+          url: "/tours"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          expect:
+            - statusCode: 200
